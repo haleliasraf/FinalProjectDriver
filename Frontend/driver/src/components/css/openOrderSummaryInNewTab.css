@@ -1,0 +1,14 @@
+/* OrderSummary.css */
+.paragraph-container {
+    border: 1px solid #000; /* מסגרת דקה שחורה */
+    padding: 10px; /* ריווח בפנים התבנית */
+    margin-bottom: 10px; /* ריווח מתחת לתבנית */
+    background-color: beige; /* צבע רקע בז' */
+    animation: changeBackground 5s infinite alternate; /* אנימציה לשינוי רקע */
+  }
+  
+  @keyframes changeBackground {
+    from { background-color: beige; }
+    to { background-color: gold; }
+  }
+  

@@ -1,0 +1,19 @@
+/* קובץ CSS עבור הרקע */
+/* ניתן להוסיף עיצוב נוסף כגון פונטים, מידות ועוד כאן */
+
+/* סגנון עבור רקע הדף */
+.StyledBackground {
+    background-image: url('DRIVER (1).jpg');
+    background-size: 350%;
+    background-repeat: repeat;
+    background-position: center center;
+    background-color: #f0f0f0;
+  }
+
+  .body {
+    background-image: url('DRIVER (1).jpg');
+    background-size: 350%;
+    background-repeat: repeat;
+    background-position: center center;
+  }
+  
