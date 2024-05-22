@@ -4,6 +4,7 @@ using DL.DLFunction;
 using DL.Models;
 using DTO.DTO;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +32,8 @@ builder.Services.AddScoped<IUpcomingTravelsBL, UpcomingTravelsBL>();
 builder.Services.AddScoped<IUpcomingTravelD, UpcomingTravelD>();
 //builder.Services.AddAutoMapper(typeof(AreaMapper);
 builder.Services.AddDbContext<DriverDbContext>(options =>
-    options.UseSqlServer("Server=DESKTOP-M884RIP;Database=DriverDB;Trusted_Connection=True;TrustServerCertificate=True;"));
+    options.UseSqlServer("Server=.;Database=DriverDB;Trusted_Connection=True;TrustServerCertificate=True;"));
+//options.UseSqlServer("Server=DESKTOP-M884RIP;Database=DriverDB;Trusted_Connection=True;TrustServerCertificate=True;"));
 
 var app = builder.Build();
 
