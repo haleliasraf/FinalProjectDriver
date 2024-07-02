@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DL.Models;
 
-public  class Contact
+public partial class Contact
 {
     public int Id { get; set; }
 
@@ -16,4 +16,8 @@ public  class Contact
     public DateTime Date { get; set; }
 
     public string? Status { get; set; }
+
+    public int StatusId { get; set; }
+
+    public virtual Status StatusNavigation { get; set; } = null!;
 }

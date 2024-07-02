@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,7 +38,7 @@ namespace DL.DLFunction
             try
             {
 
-                List<Ship> _ships = await _driverContext.Ships.ToListAsync();
+                List<Ship> _ships = await _driverContext.Ships.Include(e => e.User).Include(s => s.Status).OrderByDescending(x => x.Date).ToListAsync();
 
                 return _ships;
             }
@@ -68,8 +69,10 @@ namespace DL.DLFunction
         {
             try
             {
-                List<Ship> ship = await _driverContext.Ships.Where(ship => ship.UserId == User_id)
+                List<Ship> ship = await _driverContext.Ships
+                    .Where(ship => ship.UserId == User_id && ship.Date >= DateTime.Now.Date)
                     .Include(sh => sh.User)
+                    .Include(s => s.Status)
                     .Include(sh => sh.Driver).ToListAsync();
 
                 return ship;

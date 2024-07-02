@@ -1,179 +1,164 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { addUser } from "../utils/userUtil";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setConnectedUser } from "../features/userSlice";
 import './css/SignIn.css';
-import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
+import { TextField, Button, Box, IconButton } from '@mui/material';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+import SendIcon from '@mui/icons-material/Send';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
-  });
+});
 
 const SignUp = ({ open, setOpen }) => {
-    const [phone, setphone] = useState("")
-    const [password, setpassword] = useState("")
-    const [firstname, setfirstname] = useState("")
-    const [lastname, setlastname] = useState("")
-    const [email, setemail] = useState("")
-    const [error, setError] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [emailError, setEmailError] = useState(false);
-    const [phoneError, setPhoneError] = useState(false);
-    const [passwordError, setPasswordError] = useState(false);
 
-
-
-    const handleClickOpen = () => {
+    useEffect(() => {
         setOpen(true);
-    };
+    }, []);
 
     const handleClose = () => {
         setOpen(false);
     };
-    const validatePassword = (password) => {
-        return password.length >= 8;
-    }
 
-    const validatePhone = (phone) => {
-        var re = /^(\+?\d{1,4}[\s-])?(?!0+\s+,?$)\d{10}\s*,?$/;
-        return re.test(String(phone));
-    }
-      
-    const validateEmail = (email) => {
-    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-    }
+    const validationSchema = Yup.object().shape({
+        email: Yup.string().email('כתובת האימייל שהוזנה אינה תקינה').required('נדרש אימייל'),
+        password: Yup.string().min(8, 'הסיסמה חייבת לכלול לפחות 8 תווים').required('נדרשת סיסמה'),
+        firstname: Yup.string().required('נדרש שם פרטי'),
+        lastname: Yup.string().required('נדרש שם משפחה'),
+        phone: Yup.string().matches(/^(\+?\d{1,4}[\s-])?(?!0+\s+,?$)\d{10}\s*,?$/, 'המספר שהוזן אינו תקין').required('נדרש מספר טלפון')
+    });
 
-    const handlePasswordChange = (passwordInput) => {
-        setpassword(passwordInput);
-        if (!validatePassword(passwordInput)) {
-           
-            setPasswordError(true);
-        } else {
-            setError("");
-            setPasswordError(false);
-        }
-    };
-
-    const handlePhoneChange = (phoneInput) => {
-        setphone(phoneInput);
-        if (!validatePhone(phoneInput)) {
-          
-            setPhoneError(true);
-        } else {
-            setError("");
-            setPhoneError(false);
-        }
-    };
-
-    const handleEmailChange = (emailInput) => {
-        setemail(emailInput);
-        if (!validateEmail(emailInput)) {
-           
-            setEmailError(true);
-        } else {
-            setError("");
-            setEmailError(false);
-        }
-    };
-    
-
-    
-    const handleClickSignUp = async () => {
-        let user = {
-            email: email,
-            password,
-            phone: phone,
-            firstname: firstname,
-            lastname: lastname,
-            error: error,
-            //openSignup:openSignup
-        }
-        if(emailError !="" || passwordError != ""){
-            return;
-        }
-        await addUser(user).then(res => {
-            if (res.status === 200) {
-                setError("");
-                alert("התחברת בהצלחה");
+    const handleClickSignUp = async (values, { setSubmitting, setErrors }) => {
+        try {
+            const response = await addUser(values);
+            if (response.status === 200) {
+                // alert("התחברת בהצלחה");
+                // dispatch(setConnectedUser(response.data));
+                // if(res.data.level===1){ 
+                //     navigate("/WorkersManagement");
+                // }
+                // else{
+                //     setErrors("");
+                //     setissuccess("התחברת בהצלחה"); 
+                //     navigate("/");
+                // }
                 navigate("/");
-                setEmailError(false);
+            } else if (response.status === 204) {
+                setErrors({ email: 'כתובת האימייל כבר קיימת' });
+            } else if (response.status === 500) {
+                setErrors({ server: 'אופס המערכת נתקלה בבעיה...' });
             }
-            else if(res.status === 204){
-                console.log(res);
-                setError("כתובת האיימיל כבר קיימת.");
-            }
-            else if(res.status === 500) {
-                setError("אופס המערכת נתקלה בבעיה...");
-            }
+        } catch (error) {
+            setErrors({ server: 'אופס המערכת נתקלה בבעיה...' });
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
-
-        });
-    }
     return (
-        <>
-            <Dialog
-                open={open}
-                TransitionComponent={Transition}
-                keepMounted
-                onClose={handleClose}
-                aria-describedby="alert-dialog-slide-description"
+        <Dialog
+            open={open}
+            TransitionComponent={Transition}
+            keepMounted
+            onClose={handleClose}
+            aria-describedby="alert-dialog-slide-description"
+        >
+            <div
+                sx={{
+                    border: '4px solid #000000',
+                    borderImage: 'linear-gradient(to right ,#4b4944, #c7b451)',
+                    borderImageSlice: 3,
+                    borderRadius: '10px',
+                }}
             >
                 <DialogTitle>הרשמה</DialogTitle>
                 <DialogContent>
-                    <h1>הרשמה</h1>
-                    <label>הכנס כתובת מייל</label>
-                    <input type="email"value={email}onChange={(e) => handleEmailChange(e.target.value)}style={{ borderColor: emailError ? 'red' : 'initial' }} /><br />
-                { emailError && <><span style={{color: 'red'}}>*</span><small 
-                     style={{color: 'red'}}> המייל שהוזן אינו תקין</small><br />
-                     </>}
-                     
-                    <label>הכנס סיסמא</label>
-                    <input type="password"value={password}onChange={(e) => handlePasswordChange(e.target.value)}style={{ borderColor: passwordError ? 'red' : 'initial' }} /><br />
-                     { passwordError && <><span style={{color: 'red'}}>*</span><small 
-                     style={{color: 'red'}}  >הססמא שהוזנה אינה תקינה </small><br /></>}
-                     <small style={{color: 'blue'}}>הסיסמה חייבת לכלול לפחות 8 תווים</small><br />
-                    <label>הכנס שם פרטי</label>
-                    <input type="firstname" value={firstname} onChange={(e) => setfirstname(e.target.value)} /><br />
-                    <label>הכנס שם משפחה</label>
-                    <input type="lastname" value={lastname} onChange={(e) => setlastname(e.target.value)} /><br />
-                    <label>הכנס מספר טלפון</label>
-                    <input type="phone"value={phone}onChange={(e) => handlePhoneChange(e.target.value)}style={{ borderColor: phoneError ? 'red' : 'initial' }} /><br />
-                { phoneError && <><span style={{color: 'red'}}>*</span><small 
-                     style={{color: 'red'}}> המספר שהוזן אינו תקין</small><br /></>}
-
-                    {error != "" && <><span>{error}</span><br /></>}
-                    {/* {error!="" ? <span></span>: null} */}
-                    {/* <button onClick={handleClickSignUp}>הרשמה</button> */}
+                    <Formik
+                        initialValues={{ email: '', password: '', firstname: '', lastname: '', phone: '' }}
+                        validationSchema={validationSchema}
+                        onSubmit={handleClickSignUp}
+                    >
+                        {({ isSubmitting, errors }) => (
+                            <Form>
+                                <Field
+                                    as={TextField}
+                                    name="email"
+                                    label="הכנס כתובת מייל"
+                                    type="email"
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    error={!!errors.email}
+                                    helperText={<ErrorMessage name="email" component="small" style={{ color: 'red' }} />}
+                                />
+                                <Field
+                                    as={TextField}
+                                    name="password"
+                                    label="הכנס סיסמא"
+                                    type="password"
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    error={!!errors.password}
+                                    helperText={<ErrorMessage name="password" component="small" style={{ color: 'red' }} />}
+                                />
+                                <Field
+                                    as={TextField}
+                                    name="firstname"
+                                    label="הכנס שם פרטי"
+                                    type="text"
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    error={!!errors.firstname}
+                                    helperText={<ErrorMessage name="firstname" component="small" style={{ color: 'red' }} />}
+                                />
+                                <Field
+                                    as={TextField}
+                                    name="lastname"
+                                    label="הכנס שם משפחה"
+                                    type="text"
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    error={!!errors.lastname}
+                                    helperText={<ErrorMessage name="lastname" component="small" style={{ color: 'red' }} />}
+                                />
+                                <Field
+                                    as={TextField}
+                                    name="phone"
+                                    label="הכנס מספר טלפון"
+                                    type="text"
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    error={!!errors.phone}
+                                    helperText={<ErrorMessage name="phone" component="small" style={{ color: 'red' }} />}
+                                />
+                                {errors.server && <div style={{ color: 'red' }}>{errors.server}</div>}
+                                <DialogActions>
+                                    <Button type="submit" disabled={isSubmitting}>
+                                        הרשמה
+                                    </Button>
+                                </DialogActions>
+                            </Form>
+                        )}
+                    </Formik>
                 </DialogContent>
-
-                <DialogActions>
-                    <Button onClick={handleClickSignUp}>הרשמה
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </>
+            </div>
+        </Dialog>
     );
-
 };
 
-// const Popup = ({ message }) => {
-//     return (
-//         <div className="popup">
-//             <div className="popup-content">
-//                 <h2>התחברות מוצלחת</h2>
-//                 <p>{message}</p>
-//             </div>
-//         </div>
-//     );
-// }
 export default SignUp;
-

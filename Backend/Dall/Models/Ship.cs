@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DL.Models;
 
-public  class Ship
+public partial class Ship
 {
     public int Id { get; set; }
 
@@ -23,13 +23,13 @@ public  class Ship
 
     public string? ShipSdress { get; set; }
 
-    public DateTime? DateReceived { get; set; }
+    public DateOnly? DateReceived { get; set; }
 
-    public DateTime? Date1 { get; set; }
+    public DateOnly? Date1 { get; set; }
 
     public virtual Driver? Driver { get; set; }
 
-    public virtual Status Status { get; set; }
+    public virtual Status Status { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;
 }

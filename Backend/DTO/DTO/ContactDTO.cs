@@ -7,12 +7,15 @@ public class ContactDTO
 {
     public int Id { get; set; }
 
-    public string Phon { get; set; } = null!;
+    public string? Phon { get; set; }
 
-    public string Name { get; set; } = null!;
+    public string? Name { get; set; }
 
-    public string Details { get; set; } = null!;
+    public string? Details { get; set; }
 
     public DateTime Date { get; set; }
+
     public string? Status { get; set; }
+
+    public int StatusId { get; set; }
 }

@@ -5,14 +5,57 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: url('../public/images/background-driver.png');
   background-repeat: no-repeat;
   background-size: 100%;
   background-position: center;
   direction: rtl;
+  /* background-color: #FAF9F1; */
 }
+
+.image-background {
+  background-image: url('../public/mp4/Draiver.mp4');
+ 
+}
+
+.logo-image {
+  width: 350px; /* Example width */
+  height: auto; /* Maintain aspect ratio */
+}
+
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.deliver {
+  background-image: url('../public/images/deliver.png');
+}
+.tracking {
+  background-image: url('../public/images/tracking.png');
+}
+.travel {
+  background-image: url('../public/images/travel.png');
+
+}
+.workerManegmant {
+  background-image: url('../public/images/drivers\ .png');
+
+}
+
+
+.upcomingTravel {
+  background-image: url('../public/images/upcomingTravel.png');
+
+}
+
+
+.costumerService{
+  background-image: url('../public/images/contact.png');
+
+}
+
+.AbuotUs{
+  background-image: url('../public/images/abuotUs.png');
+
 }

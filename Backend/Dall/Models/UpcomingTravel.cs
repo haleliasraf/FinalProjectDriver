@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DL.Models;
 
-public  class UpcomingTravel
+public partial class UpcomingTravel
 {
     public int Id { get; set; }
 
@@ -27,9 +27,13 @@ public  class UpcomingTravel
 
     public int? Numpassenger { get; set; }
 
+    public int StatusId { get; set; }
+
     public virtual Area Area { get; set; } = null!;
 
     public virtual Driver Driver { get; set; } = null!;
+
+    public virtual Status Status { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;
 }

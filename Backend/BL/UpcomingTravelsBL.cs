@@ -69,7 +69,21 @@ namespace BL
             }
 
         }
+        public async Task<List<UpcomingTravelDTO>> GetByUserIdUpcomingTravel(int User_id)
+        {
+            try
+            {
 
+                List<UpcomingTravel> insertedShip = await this._UpcomingTravelDL.GetByUserIdUpcomingTravel(User_id);
+
+                return _mapper.Map<List<UpcomingTravelDTO>>(insertedShip);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
         public async Task<UpcomingTravelDTO> updatUpcomingTravel(UpcomingTravelDTO userdto)
         {
             try

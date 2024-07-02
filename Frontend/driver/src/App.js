@@ -11,6 +11,8 @@ import CustomerService from './components/CustomerService';
 import Tracking from './components/Tracking';
 import AllOrders from './components/OrderMenagment';
 import WorkersManagement from './components/WorkersManagement';
+import EditUsers from './components/EditUser';
+
 
 import { BrowserRouter, Route, Router, Routes, useNavigate } from 'react-router-dom';
 import AppRouter from './components/App-Router';
@@ -19,25 +21,13 @@ import { useEffect, useState } from 'react';
 import DriversWorkers from'./components/DriversWorkers';
 import CustomerOrders from './components/CustomerOrders';
 import Inquiries from './components/Inquiries';
-
-
+import { useSelector } from 'react-redux';
 
 function App() {
-  const [openSignIn, setOpenSignIn] = useState(false);
   const navigate = useNavigate();
   const [openSignUp, setOpenSignUp] = useState(false);
+  const [openSignIn, setOpenSignIn] = useState(false);
 
-  useEffect(()=> {
-    setOpenSignIn(true);
-    const timerSignIn = setTimeout(() => {
-        navigate('/signIn');
-    },3000);
-
-    return() => {
-      clearTimeout(timerSignIn);
-    }
-
-  },[]);
 
 
   // useEffect(()=> {
@@ -73,6 +63,8 @@ function App() {
             <Route path="/Inquiries" element={<Inquiries/>}></Route>
             <Route path="/DriversWorkers" element={<DriversWorkers/>}></Route>
             <Route path="/customerOrders" element={<CustomerOrders/>}></Route>
+            <Route path="/EditUser" element={<EditUsers/>}></Route>
+
 
 
         </Route>    

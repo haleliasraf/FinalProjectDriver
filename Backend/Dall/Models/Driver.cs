@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DL.Models;
 
-public  class Driver
+public partial class Driver
 {
     public int Id { get; set; }
 

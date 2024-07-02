@@ -32,6 +32,12 @@ namespace Finish_Project.Controllers
             return driver;
         }
 
+        [HttpGet("GetShipsByUserId/{userId}")]
+        public async Task<List<UpcomingTravelDTO>> GetShipsByUserId(int userId)
+        {
+            List<UpcomingTravelDTO> ship = await UpcomingTravelsBL.GetByUserIdUpcomingTravel(userId);
+            return ship;
+        }
         [HttpPost]
         public async Task<UpcomingTravelDTO> AddUpcomingTravel(UpcomingTravelDTO newUser)
         {

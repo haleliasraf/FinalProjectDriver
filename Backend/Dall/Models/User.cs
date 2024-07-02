@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DL.Models;
 
-public  class User
+public partial class User
 {
     public int Id { get; set; }
 

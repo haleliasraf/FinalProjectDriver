@@ -7,4 +7,11 @@ const api = axios.create({
     }
 })
 
+export const apiImage = axios.create({
+    baseURL: "https://localhost:44376/api/",
+    headers:{
+        "Content-Type": "image/jpeg"
+    }
+})
+
 export default api;

@@ -36,7 +36,10 @@ namespace DL.DLFunction
             try
             {
 
-                List<UpcomingTravel> upcomingTravel = await _driverContext.UpcomingTravels.Include(ut => ut.User).Include(ut => ut.Driver).ToListAsync();
+                List<UpcomingTravel> upcomingTravel = await _driverContext.UpcomingTravels.Include(ut => ut.User)
+                    .Include(ut => ut.Driver)
+                    .Include(s => s.Status).OrderByDescending(x => x.Date)
+                    .ToListAsync();
 
                 return upcomingTravel;
             }
@@ -47,14 +50,31 @@ namespace DL.DLFunction
         }
 
 
-
-
-        public async Task<List<UpcomingTravel>> GetByIdUpcomingTravel(int User_id)
+        public async Task<List<UpcomingTravel>> GetByUserIdUpcomingTravel(int User_id)
         {
             try
             {
-                List<UpcomingTravel> _upcomingTravel = await _driverContext.UpcomingTravels.Where(s => s.UserId == User_id)
+                List<UpcomingTravel> UpcomingTravels = await _driverContext.UpcomingTravels
+                    .Where(UpcomingTravel => UpcomingTravel.UserId == User_id && UpcomingTravel.Date >= DateTime.Now.Date)
+                    .Include(sh => sh.User)
+                    .Include(s => s.Status)
+                    .Include(sh => sh.Driver).ToListAsync();
+
+                return UpcomingTravels;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<List<UpcomingTravel>> GetByIdUpcomingTravel(int id)
+        {
+            try
+            {
+                List<UpcomingTravel> _upcomingTravel = await _driverContext.UpcomingTravels.Where(s => s.Id == id )
                     .Include(s => s.Area)
+                    .Include(s => s.Status)
                     .Include(s => s.User)
                     .Include(s => s.Driver).ToListAsync();
 
@@ -65,6 +85,7 @@ namespace DL.DLFunction
                 throw ex;
             }
         }
+  
 
 
         public async Task<UpcomingTravel> updatUpcomingTravel(UpcomingTravel upcomingTravel)
@@ -85,8 +106,7 @@ namespace DL.DLFunction
         }
 
 
-        public async Task<bool> DeleteUpcomingTravel(int upcomingTravel_id)
-        {
+            public async Task<bool> DeleteUpcomingTravel(int upcomingTravel_id){
             try
             {
                 UpcomingTravel _upcomingTravel = await _driverContext.UpcomingTravels.FirstOrDefaultAsync(x => x.Id == upcomingTravel_id);

@@ -27,9 +27,13 @@ public  class UpcomingTravelDTO
     public string Phone { get; set; } = null!;
 
     public int Numpassenger { get; set; }
+    public int StatusId { get; set; }
+
     public virtual AreaDTO ?Area { get; set; } = null!;
 
     public virtual DriverDTO ?Driver { get; set; } = null!;
+
+    public virtual StatusDTO? Status { get; set; } = null!;
 
     public virtual UserDTO ?User { get; set; } = null!;
 }

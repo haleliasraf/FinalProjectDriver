@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialValue = {
-    connectedUser: null,
+    connectedUser: JSON.parse(localStorage.getItem('user')) || null,
     // users:[],
     // count: 0,
     // flag: false,
@@ -13,9 +13,11 @@ const userSlice = createSlice({
     reducers: {
         setConnectedUser: (state, action) => {
             state.connectedUser = action.payload;
+            localStorage.setItem('user', JSON.stringify(action.payload));
         },
         setUnConnectedUser: (state, action) => {
             state.connectedUser = null;
+            localStorage.removeItem('user');
         }
     }
 })

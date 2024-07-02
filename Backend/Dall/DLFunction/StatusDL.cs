@@ -49,8 +49,6 @@ namespace DL.DLFunction
         }
 
 
-
-
         public async Task<Status> GetByIdStatus(int status_id)
         {
             try

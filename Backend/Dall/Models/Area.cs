@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DL.Models;
 
-public  class Area
+public partial class Area
 {
     public int Id { get; set; }
 

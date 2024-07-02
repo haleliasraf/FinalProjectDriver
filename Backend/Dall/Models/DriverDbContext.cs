@@ -31,8 +31,7 @@ public partial class DriverDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=.;Database=DriverDB;Trusted_Connection=True; TrustServerCertificate=True;");
-            //=> optionsBuilder.UseSqlServer("Server=DESKTOP-M884RIP;Database=DriverDB;Trusted_Connection=True; TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-M884RIP;Database=DriverDB;Trusted_Connection=True; TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -42,6 +41,7 @@ public partial class DriverDbContext : DbContext
 
             entity.ToTable("Area");
 
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
                 .IsUnicode(false);
@@ -66,6 +66,12 @@ public partial class DriverDbContext : DbContext
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("status");
+            entity.Property(e => e.StatusId).HasColumnName("Status_id");
+
+            entity.HasOne(d => d.StatusNavigation).WithMany(p => p.Contacts)
+                .HasForeignKey(d => d.StatusId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_contact_status");
         });
 
         modelBuilder.Entity<Driver>(entity =>
@@ -155,6 +161,7 @@ public partial class DriverDbContext : DbContext
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .HasColumnName("phone");
+            entity.Property(e => e.StatusId).HasColumnName("Status_id");
             entity.Property(e => e.Time)
                 .HasMaxLength(100)
                 .IsUnicode(false);
@@ -169,6 +176,11 @@ public partial class DriverDbContext : DbContext
                 .HasForeignKey(d => d.DriverId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__UpcomingT__Drive__59FA5E80");
+
+            entity.HasOne(d => d.Status).WithMany(p => p.UpcomingTravels)
+                .HasForeignKey(d => d.StatusId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UpcomingTravels_UpcomingTravels");
 
             entity.HasOne(d => d.User).WithMany(p => p.UpcomingTravels)
                 .HasForeignKey(d => d.UserId)

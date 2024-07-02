@@ -1,139 +1,126 @@
-import React, { useState } from "react";
+
+
+import React from "react";
 import { getShipById } from "../utils/shipUtil";
-
 import { useSelector } from "react-redux";
-import axios from 'axios';
- 
-import { TextField, Button, Box, IconButton } from '@mui/material';
-import InputAdornment from '@mui/material/InputAdornment';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import FormControl from '@mui/material/FormControl';
-import { Container } from '@mui/material';
-import SaveIcon from '@mui/icons-material/Save';
-
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { TextField, Button, Box, Container } from '@mui/material';
+import ShareLocationIcon from '@mui/icons-material/ShareLocation';
+import SendIcon from '@mui/icons-material/Send';
+import  { useState } from "react";
 
 
 const Tracking = () => {
-  const [id, setid] = useState("")
   const connectedUser = useSelector(state => state.user.connectedUser);
   const [response, setResponse] = useState();
 
-
-  const fetchData = async () => {
-    try {
-      await getShipById(id).then((res) => {
-        debugger
-        setResponse(res.data)
+  const formik = useFormik({
+    initialValues: {
+      id: '',
+    },
+    validationSchema: Yup.object({
+      id: Yup.string()
+        .required('מספר הזמנה הוא שדה חובה')
+    }),
+    onSubmit: async (values, { setSubmitting, setErrors }) => {
+      try {
+        const res = await getShipById(values.id);
+        setResponse(res.data);
+     
+       if (res.status===204) {
+        console.error('מספר הזמנה לא נמצא');
+        setErrors({ id: 'מספר הזמנה לא נמצא' });
       }
-
-      )
-
-      console.log(response.data); // מדפיס את הנתונים שהתקבלו מהבקשה GET
-    } catch (error) {
-      console.error('מספר הזמנה לא נמצא ', error);
     }
-  };
+       catch (error) {
+        console.error('יש בעיה בצד שלנו ');
+        setErrors({ id: 'יש בעיה בצד שלנו' });
+     
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   return (
-    <>
- <>
-
-<Container component="main" maxWidth="200px">
-<Box
-sx={{
-marginTop: 8,
-display: 'flex',
-flexDirection: 'column'
-}}
->
-<Box
-component="form"
-sx={{
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  width:'500px',
-  '& .MuiTextField-root': { width: '90%' },
-  backgroundColor: 'white',
-  borderRadius:'5px',
-  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-  marginLeft: 'auto',
-  marginRight: 'auto',
-
-}}
-// noValidate
-// onSubmit={handleSubmit}
- autoComplete="on"
->
-{/* <div> */}
-
-<h2 >  מעקב אחרי משלוח</h2>
-
-
-    <TextField
-      sx={{ textAlign: 'right' }}
-      id="outlined-multiline-flexible"
-      name='traking'
-      value={id}
-      label="מספר הזמנה"
-      multiline
-      maxRows={4}
-      onChange={(e) => setid(e.target.value)}
-      fullWidth
-      margin="normal"
-      required
-    />
-    
-      <Button
-variant="contained"
-color="primary"
-startIcon={<SaveIcon />}
-type="button"
-size="large"
-sx={{ marginTop: '20px' }}
-onClick={fetchData}
->
-קבלת סטטוס 
-</Button>
-
-</Box>
-</Box>
-
-</Container>
-
-</>
-<div className="container">
-
-{response && (
-<p>
-<p> {response.status.description} </p>
-
-</p>
-)}
-
-</div>
-    </>
-  )
+    <Container className="tracking"
+      sx={{
+        marginTop: '0px',
+        backgroundSize: 'cover', // Optional: Ensures the image covers the container
+      }}
+      component="main" maxWidth="200px">
+      <Box
+        sx={{
+          height: '84vh',
+          width: '95vw',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '5px',
+          borderRadius: '7px'
+        }}
+      >
+        <Box
+          component="form"
+          onSubmit={formik.handleSubmit}
+          sx={{
+            marginTop: '100px',
+            padding: '5px',
+            borderRadius: '10px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '500px',
+            '& .MuiTextField-root': { width: '90%' },
+            backgroundColor: '#faf9f1',
+            borderRadius: '2px',
+            boxShadow: '0 2px 2px rgba(0, 0, 0, 0.1)',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+          autoComplete="on"
+        >
+          <ShareLocationIcon sx={{ fontSize: '60px', mergin: 0 }}></ShareLocationIcon>
+          <h2 style={{ margin: '0px' }}>מעקב אחרי משלוח</h2>
+          <TextField
+            sx={{ textAlign: 'right' }}
+            id="id"
+            name="id"
+            label="מספר הזמנה"
+            value={formik.values.id}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.id && Boolean(formik.errors.id)}
+            helperText={formik.touched.id && formik.errors.id}
+            multiline
+            maxRows={4}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<SendIcon />}
+            type="submit"
+            size="large"
+            sx={{ marginTop: '20px', backgroundColor: '#bdad73', color: "black" }}
+            disabled={formik.isSubmitting}
+          >
+            .קבלת סטטוס
+          </Button>
+          <br />
+          <br />
+          <div className="container">
+            {response && (
+              <p>{response.status.description}</p>
+            )}
+          </div>
+        </Box>
+      </Box>
+    </Container>
+  );
 }
 
-export default Tracking
-
-
-{/* <>
-<lable>מספר הזמנה </lable>
-<input type="string" value={id} onChange={(e) => setid(e.target.value)}></input>
-<button onClick={fetchData}>קבלת סטטוס</button><br />
-<lable> סטטוס הזמנה</lable><br />
-<div className="container">
-
-{response && (
-<p>
-<p> {response.status.description} </p>
-
-</p>
-)}
-
-</div>
-</> */}
+export default Tracking;

@@ -37,7 +37,7 @@ namespace DL.DLFunction
             try
             {
 
-                List<Contact> contact = await _driverContext.Contacts.ToListAsync();
+                List<Contact> contact = await _driverContext.Contacts.OrderBy(x => x.StatusId).ToListAsync();
 
                 return contact;
             }

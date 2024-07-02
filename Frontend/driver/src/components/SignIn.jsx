@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+
+
+import React from "react";
 import { login } from "../utils/userUtil";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -8,149 +10,117 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
+import { TextField, Box } from '@mui/material';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const SignIn = ({open, setOpen,setOpenSingUp}) => {
-    const [email, setemail] = useState("");
-    const [password, setpassword] = useState("");
-    const [error, setError] = useState("");
-    const [issuccess, setissuccess] = useState("");
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const [passwordError, setPasswordError] = useState(false);
-    const [emailError, setEmailError] = useState(false);
+const SignIn = ({ open, setOpen, setOpenSingUp }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-    
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-    const handleClose = () => {
-        setOpen(false);
-    };
-    const validatePassword = (password) => {
-        return password.length >= 8;
-    }
-    const handlePasswordChange = (passwordInput) => {
-        setpassword(passwordInput);
-        if (!validatePassword(passwordInput)) {
-            setPasswordError(true);
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validationSchema: Yup.object({
+      email: Yup.string()
+        .email('המייל שהוזן אינו תקין')
+        .required('שדה המייל הוא חובה'),
+      password: Yup.string()
+        .min(8, 'הסיסמה חייבת לכלול לפחות 8 תווים')
+        .required('שדה הסיסמא הוא חובה'),
+    }),
+    onSubmit: async (values, { setSubmitting, setErrors }) => {
+      let user = {
+        email: values.email,
+        password: values.password
+      };
+      try {
+        const res = await login(user);
+        if (res.status === 200) {
+          dispatch(setConnectedUser(res.data));
+          if (res.data.level === 1) {
+            navigate("/WorkersManagement");
+          } else {
+            navigate("/");
+          }
         } else {
-            setError("");
-            setPasswordError(false);
+          setErrors({ general: "אחד מהנתונים שהוקשו שגוי" });
         }
-    };
-
-    const validateEmail = (email) => {
-        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(String(email).toLowerCase());
-        }
-
-        const handleEmailChange = (emailInput) => {
-            setemail(emailInput);
-            if (!validateEmail(emailInput)) {
-                
-                setEmailError(true);
-            } else {
-                setError("");
-                setEmailError(false);
-            }
-        };
-
-    const handleClickSignIn = async() => {
-        let user = {
-            email: email,
-            password
+      } catch (error) {
+        setErrors({ general: "אחד מהנתונים שהוקשו שגוי" });
+      } finally {
+        setSubmitting(false);
       }
-        await login(user).then(res => {
-            if(res.status === 200){
-                dispatch(setConnectedUser(res.data));
-                if(res.data.level===1){ 
-                    navigate("/WorkersManagement");
-                }
-                else{
-                setError("");
-                setissuccess("התחברת בהצלחה"); 
-                navigate("/");
-                }
-            }
-            else{
-                setError("אחד מהנתונים שהוקשו שגוי");
-                setissuccess(" "); 
-            }
-        });
-    }
+    },
+  });
 
-    return (
-        <>
-        {/* <div className="sign-in-popup">
-            <div className="container">
-            <h1>התחברות</h1>
-            <Link to="/SignUp">להרשמה</Link><br/>
-            <label>הכנס כתובת מייל</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}/><br/>
-            <label>הכנס סיסמא</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}/><br/>
-            {error !== "" && <><span>{error}</span><br/></>}
-            {issuccess && <Popup message={issuccess} />} 
-            
-            <button onClick={handleClickSignIn}>התחברות</button>
-            </div>
-        </div> */}
-      <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={handleClose}
-        aria-describedby="alert-dialog-slide-description"
-      >
+  return (
+    <Dialog
+      open={open}
+      TransitionComponent={Transition}
+      keepMounted
+      onClose={handleClose}
+      aria-describedby="alert-dialog-slide-description"
+    >
+      <form onSubmit={formik.handleSubmit}>
         <DialogTitle>התחברות</DialogTitle>
         <DialogContent>
-        {/* <Link to="/SignUp">להרשמה</Link><br/> */}
-            <label>הכנס כתובת מייל</label>
-            <input type="email"value={email}onChange={(e) => handleEmailChange(e.target.value)}style={{ borderColor: emailError ? 'red' : 'initial' }} /><br />
-        { emailError && <><span style={{color: 'red'}}>*</span><small style={{color: 'red'}}> האימייל שהוזן אינו תקין</small><br /></>}     
-            <label>הכנס סיסמא</label>
-            <input type="password"value={password}onChange={(e) => handlePasswordChange(e.target.value)}  style={{ borderColor: passwordError ? 'red' : 'initial' }} /><br />
-            { passwordError && <><span style={{color: 'red'}}>*</span><small style={{color: 'red'}}  >הסיסמא שהוזנה אינה תקינה </small><br /></>} 
-            {/* <small style={{color: 'blue'}}>הסיסמה חייבת לכלול לפחות 8 תווים</small><br /> */}
-         {error !== "" && <><span>{error}</span><br/></>}
-            {issuccess && <Popup message={issuccess} />} {/* הפעלת ה-Popup עם הודעת הצלחת התחברות */}
-        
+          <TextField
+            sx={{ textAlign: 'right' }}
+            id="email"
+            name="email"
+            label="הכנס כתובת מייל"
+            type="email"
+            fullWidth
+            margin="normal"
+            required
+            value={formik.values.email}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.email && Boolean(formik.errors.email)}
+            helperText={formik.touched.email && formik.errors.email}
+          />
+          <TextField
+            sx={{ textAlign: 'right' }}
+            id="password"
+            name="password"
+            label="הכנס סיסמא"
+            type="password"
+            fullWidth
+            margin="normal"
+            required
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.password && Boolean(formik.errors.password)}
+            helperText={formik.touched.password && formik.errors.password}
+          />
+          {formik.errors.general && (
+            <span style={{ color: 'red' }}>{formik.errors.general}</span>
+          )}
         </DialogContent>
         <DialogActions>
-         
-          <Button onClick={handleClickSignIn} disabled={passwordError||emailError}>התחברות </Button><br/>
-          <Button ></Button> 
-          <Button ></Button> 
-         <br/> 
-          <p>אין לך עדין חשבון <Link to="/SignUp">הרשם</Link></p><br/>
-          {/* <Button onClick={<Link to="/SignUp">להרשמה</Link>}>הרשמה</Button> */}
+          <Button type="submit" disabled={formik.isSubmitting}>
+            התחברות
+          </Button>
+          <Button></Button>
+          <p>אין לך עדין חשבון <Link to="/SignUp">הרשם</Link></p>
         </DialogActions>
-      </Dialog>
-        </>
-
-    );
-
-
-}
-
-
-const Popup = ({ message }) => {
-    return (
-        <div className="popup">
-            <div className="popup-content">
-                <h2>התחברות מוצלחת</h2>
-                <p>{message}</p>
-            </div>
-        </div>
-    );
-}
+      </form>
+    </Dialog>
+  );
+};
 
 export default SignIn;
